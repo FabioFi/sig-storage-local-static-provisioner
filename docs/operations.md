@@ -32,12 +32,12 @@ Glossary:
 ## Create a directory for provisioner discovering
 
 ```
-$ sudo mkdir -p /mnt/disks
+$ sudo mkdir -p /media/ssdwd
 ```
 
 NOTE: 
 
-- We use `/mnt/disks` as an example, but you can use any directory 
+- We use `/media/ssdwd` as an example, but you can use any directory 
 - This directory is configured in `hostDir` field in provisioner configuration
   and can only be configured for one storage class
 - If you want to configure more than one local storage class, create one
@@ -50,27 +50,27 @@ volumes to be discovered by provisioner.
 
 ### Use a whole disk as a filesystem PV
 
-If you attached a disk onto your machine (e.g `/dev/path/to/disk`). You
+If you attached a disk onto your machine (e.g `/dev/sda`). You
 can format and mount it into discovery directory with the following commands:
 
 1) Format and mount
 
 ```
-$ sudo mkfs.ext4 /dev/path/to/disk
-$ DISK_UUID=$(blkid -s UUID -o value /dev/path/to/disk) 
-$ sudo mkdir /mnt/disks/$DISK_UUID
-$ sudo mount -t ext4 /dev/path/to/disk /mnt/disks/$DISK_UUID
+$ sudo mkfs.ext4 /dev/sda
+$ DISK_UUID=$(blkid -s UUID -o value /dev/sda) 
+$ sudo mkdir /media/ssdwd/$DISK_UUID
+$ sudo mount -t ext4 /dev/sda /media/ssdwd/$DISK_UUID
 ```
 
 2) Persistent mount entry into /etc/fstab
 
 ```
-$ echo UUID=`sudo blkid -s UUID -o value /dev/path/to/disk` /mnt/disks/$DISK_UUID ext4 defaults 0 2 | sudo tee -a /etc/fstab
+$ echo UUID=`sudo blkid -s UUID -o value /dev/sda` /media/ssdwd/$DISK_UUID ext4 defaults 0 2 | sudo tee -a /etc/fstab
 ```
 
 NOTE:
 
-- We use `/dev/path/to/disk` as a disk example, change it to real path of your
+- We use `/dev/sda` as a disk example, change it to real path of your
   device.
 - You can also adjust filesystem and mount options as you wish
 - It's best practice to use UUID both in fstab entries and the directory name
@@ -90,10 +90,10 @@ PVs. Here is an example:
 1) Format and mount
 
 ```
-$ sudo mkfs.ext4 /dev/path/to/disk
-$ DISK_UUID=$(blkid -s UUID -o value /dev/path/to/disk) 
-$ sudo mkdir /mnt/$DISK_UUID
-$ sudo mount -t ext4 /dev/path/to/disk /mnt/$DISK_UUID
+$ sudo mkfs.ext4 /dev/sda
+$ DISK_UUID=$(blkid -s UUID -o value /dev/sda) 
+$ sudo mkdir /media/$DISK_UUID
+$ sudo mount -t ext4 /dev/sda /media/$DISK_UUID
 ```
 
 NOTE: we should not mount disk into discovery directory.
@@ -101,15 +101,15 @@ NOTE: we should not mount disk into discovery directory.
 2) Persistent mount entry into /etc/fstab
 
 ```
-$ echo UUID=`sudo blkid -s UUID -o value /dev/path/to/disk` /mnt/$DISK_UUID ext4 defaults 0 2 | sudo tee -a /etc/fstab
+$ echo UUID=`sudo blkid -s UUID -o value /dev/sda` /media/$DISK_UUID ext4 defaults 0 2 | sudo tee -a /etc/fstab
 ```
 
 3) Create multiple directories and bind mount them into discovery directory
 
 ```
 for i in $(seq 1 10); do
-  sudo mkdir -p /mnt/${DISK_UUID}/vol${i} /mnt/disks/${DISK_UUID}_vol${i}
-  sudo mount --bind /mnt/${DISK_UUID}/vol${i} /mnt/disks/${DISK_UUID}_vol${i}
+  sudo mkdir -p /media/${DISK_UUID}/vol${i} /media/disks/${DISK_UUID}_vol${i}
+  sudo mount --bind /media/${DISK_UUID}/vol${i} /media/disks/${DISK_UUID}_vol${i}
 done
 ```
 
@@ -117,7 +117,7 @@ done
 
 ```
 for i in $(seq 1 10); do
-  echo /mnt/${DISK_UUID}/vol${i} /mnt/disks/${DISK_UUID}_vol${i} none bind 0 0 | sudo tee -a /etc/fstab
+  echo /media/${DISK_UUID}/vol${i} /media/disks/${DISK_UUID}_vol${i} none bind 0 0 | sudo tee -a /etc/fstab
 done
 ```
 
@@ -144,14 +144,14 @@ lrwxrwxrwx 1 root root  9 Apr 18 14:26 lvm-pv-uuid-VqD1G2-upe2-Xnek-PdXD-mkOT-Lh
 lrwxrwxrwx 1 root root  9 Apr 18 14:26 lvm-pv-uuid-yyTnct-TpUS-U93g-JoFs-6seh-Yy29-Dn6Irf -> ../../sdb
 ```
 
-For example, if you want to use `/dev/sdb`, you must link
+For example, if you want to use `/dev/sda`, you must link
 `/dev/disk/by-id/lvm-pv-uuid-yyTnct-TpUS-U93g-JoFs-6seh-Yy29-Dn6Irf` not 
-`/dev/sdb`.
+`/dev/sda`.
 
 Link it into discovery directory:
 
 ```
-$ sudo ln -s /dev/disk/by-id/lvm-pv-uuid-yyTnct-TpUS-U93g-JoFs-6seh-Yy29-Dn6Irf /mnt/disks
+$ sudo ln -s /dev/disk/by-id/lvm-pv-uuid-yyTnct-TpUS-U93g-JoFs-6seh-Yy29-Dn6Irf /media/disks
 ```
 
 ### Separate disk into multiple partitions
@@ -161,14 +161,14 @@ tools to separate your disk into multiple partitions. This helps to isolate
 capacity. Here is an example:
 
 ```
-sudo parted --script /dev/path/to/disk \
+sudo parted --script /dev/sda \
     mklabel gpt \
     mkpart primary 1MiB 1000MiB \
     mkpart primary 1000MiB 2000MiB \
     mkpart primary 2000MiB 3000MiB \
     mkpart primary 3000MiB 4000MiB
 
-sudo parted /dev/path/to/disk print
+sudo parted /dev/sda print
 ```
 
 NOTE:
