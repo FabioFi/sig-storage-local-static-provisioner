@@ -163,10 +163,16 @@ capacity. Here is an example:
 ```
 sudo parted --script /dev/sda \
     mklabel gpt \
-    mkpart primary 1MiB 1000MiB \
-    mkpart primary 1000MiB 2000MiB \
-    mkpart primary 2000MiB 3000MiB \
-    mkpart primary 3000MiB 4000MiB
+    mkpart primary 1MiB 100000MiB \
+    mkpart primary 100000MiB 200000MiB \
+    mkpart primary 200000MiB 300000MiB \
+    mkpart primary 300000MiB 400000MiB \
+    mkpart primary 400000MiB 500000MiB \
+    mkpart primary 500000MiB 600000MiB \
+    mkpart primary 600000MiB 700000MiB \
+    mkpart primary 700000MiB 800000MiB \
+    mkpart primary 800000MiB 900000MiB
+
 
 sudo parted /dev/sda print
 ```
