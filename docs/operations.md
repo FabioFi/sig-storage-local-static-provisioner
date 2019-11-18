@@ -120,6 +120,8 @@ done
 4) Persistent bind mount entries into /etc/fstab
 
 ```
+#declare DISK_UUID
+DISK_UUID = paste the value
 for i in $(seq 1 10); do
   echo /media/${DISK_UUID}/vol${i} /media/disks/${DISK_UUID}_vol${i} none bind 0 0 | sudo tee -a /etc/fstab
 done
