@@ -109,6 +109,8 @@ $ echo UUID=`sudo blkid -s UUID -o value /dev/sda` /media/$DISK_UUID ext4 defaul
 3) Create multiple directories and bind mount them into discovery directory
 
 ```
+#declare DISK_UUID
+DISK_UUID = paste the value
 for i in $(seq 1 10); do
   sudo mkdir -p /media/${DISK_UUID}/vol${i} /media/disks/${DISK_UUID}_vol${i}
   sudo mount --bind /media/${DISK_UUID}/vol${i} /media/disks/${DISK_UUID}_vol${i}
