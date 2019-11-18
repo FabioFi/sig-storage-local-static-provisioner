@@ -91,7 +91,9 @@ PVs. Here is an example:
 
 ```
 $ sudo mkfs.ext4 /dev/sda
-$ DISK_UUID=$(blkid -s UUID -o value /dev/sda) 
+$ DISK_UUID=$(blkid -s UUID -o value /dev/sda) #not working
+$ blkid -s UUID -o value /dev/sda
+$ DISK_UUID = copy and paste last command result
 $ sudo mkdir /media/$DISK_UUID
 $ sudo mount -t ext4 /dev/sda /media/$DISK_UUID
 ```
